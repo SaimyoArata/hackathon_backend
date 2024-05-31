@@ -10,4 +10,6 @@ pip install requirements.txt
 
 uvicorn main:app --reload
 
-### URL を検索して，API が動くかを確認
+### ブラウザとかで検索して，API が動くかを確認
+
+http://localhost:8000

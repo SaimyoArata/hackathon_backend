@@ -9,4 +9,4 @@ async def root():
         return "Hello World"
     # ここで関数を呼び出す
     result = hello_world()
-    return {"message": "result"}
+    return {"message": result}
