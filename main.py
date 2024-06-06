@@ -1,42 +1,42 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from flask import Flask, request, jsonify
 import cv2
+import io
+import base64
 import numpy as np
 
-app = FastAPI()
+app = Flask(__name__)
 
-# 静的ファイルを提供する設定
-app.mount("/static", StaticFiles(directory="static"), name="static")
+def process_image(image_data):
+    # 画像データをバイナリデータにデコード
+    image_bytes = base64.b64decode(image_data)
+    np_arr = np.frombuffer(image_bytes, np.uint8)
+    image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
-@app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile = File(...)):
-    contents = await file.read()
-    nparr = np.frombuffer(contents, np.uint8)
-    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    # 画像をグレースケールに変換（ここでは例としてグレースケールに変換しているが、任意の画像処理を行っても良い）
+    processed_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    # 画像を表示（サーバー側）
-    cv2.imshow('Uploaded Image', image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # 処理された画像をバイナリデータに変換
+    _, buffered = cv2.imencode('.jpg', processed_image)
+    encoded_image = base64.b64encode(buffered).decode('utf-8')
 
-    return {"filename": file.filename}
+    return encoded_image
 
-@app.get("/")
-async def main():
-    content = """
-    <html>
-        <body>
-            <h1>Upload an image</h1>
-            <form action="/uploadfile/" enctype="multipart/form-data" method="post">
-                <input name="file" type="file">
-                <input type="submit">
-            </form>
-        </body>
-    </html>
-    """
-    return HTMLResponse(content=content)
+@app.route('/upload', methods=['POST'])
+def upload():
+    try:
+        data = request.get_json()
+        image_data = data['image']
 
+        processed_image = process_image(image_data)
+
+        return jsonify({'processed_image': processed_image})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+
+# if __name__ == '__main__':
+#     app.run(debug=True, port=5000)
 
 
 
