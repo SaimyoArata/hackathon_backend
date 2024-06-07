@@ -2,8 +2,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import base64
+from fastapi.responses import StreamingResponse
 from io import BytesIO
 from PIL import Image, UnidentifiedImageError
+import io
+from fastapi import UploadFile, File
 
 app = FastAPI()
 
@@ -22,25 +25,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class ImageData(BaseModel):
     image: str
 
+
 @app.post("/")
-async def upload_image(data: ImageData):
+async def upload_image(data: UploadFile = File(...)):
+    # 画像のバイナリデータを読み込み
+    image = Image.open(io.BytesIO(await data.read()))
+    # 画像を表示
+    # image.show()
+
     try:
-        # Base64エンコードされた画像データをデコード
-        try:
-            print("Decoding image")
-            image_data = base64.b64decode(data.image.split(",")[1])  # 'data:image/jpeg;base64,' を除去
-        except base64.binascii.Error as decode_error:
-            raise HTTPException(status_code=400, detail="Invalid base64 string")
-
-        try:
-            print("Opening image")
-            image = Image.open(BytesIO(image_data))
-        except UnidentifiedImageError as img_error:
-            raise HTTPException(status_code=400, detail="Invalid image data")
-
         # 画像をグレースケールに変換
         print("Processing image")
         processed_image = image.convert("L")
@@ -49,9 +46,10 @@ async def upload_image(data: ImageData):
         print("Encoding processed image")
         buffered = BytesIO()
         processed_image.save(buffered, format="JPEG")
-        encoded_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        buffered.seek(0)
 
-        return {"message": "Image processed successfully", "processed_image": encoded_image}
+        # return {"message": "Image processed successfully", "processed_image": encoded_image}
+        return StreamingResponse(buffered, media_type="image/jpeg")
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
