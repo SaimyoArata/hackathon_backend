@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 
-def func(image)
+def func(image):
     # Mediapipeの初期化
     mp_pose = mp.solutions.pose
     mp_drawing = mp.solutions.drawing_utils
