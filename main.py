@@ -41,8 +41,8 @@ async def upload_image(data: UploadFile = File(...)):
     # image.show()
 
     try:
-        # 画像をグレースケールに変換
-        func(image)
+        # 骨格検出とその他の処理を行う
+        processed_image = func(image)
 
         # 処理された画像をバイナリデータに変換
         print("Encoding processed image")
