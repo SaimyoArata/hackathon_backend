@@ -6,8 +6,8 @@ from fastapi.responses import StreamingResponse
 from io import BytesIO
 from PIL import Image, UnidentifiedImageError
 import io
-from fastapi import UploadFile, File
-import time
+from fastapi import UploadFile, File 
+from skeleton import func
 
 app = FastAPI()
 
@@ -42,8 +42,7 @@ async def upload_image(data: UploadFile = File(...)):
 
     try:
         # 画像をグレースケールに変換
-        print("Processing image")
-        processed_image = image.convert("L")
+        func(image)
 
         # 処理された画像をバイナリデータに変換
         print("Encoding processed image")
