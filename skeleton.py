@@ -1,5 +1,8 @@
+import os
 import cv2
 import mediapipe as mp
+
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 def func(image):
     # Mediapipeの初期化
