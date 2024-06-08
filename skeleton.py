@@ -15,7 +15,7 @@ def func(image):
     )
 
     # 画像ファイルの読み込み
-    after_rgb = cv2.imread(image)
+    image_rgb = cv2.imread(image)
     # Mediapipeの姿勢推定を実行
     results = pose.process(image_rgb)
 
