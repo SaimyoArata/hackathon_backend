@@ -15,15 +15,15 @@ def func(image):
     )
 
     # 画像ファイルの読み込み
-    image = cv2.imread(image)
+    after_image = cv2.imread(image)
     # Mediapipeの姿勢推定を実行
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image_rgb = cv2.cvtColor(after_image, cv2.COLOR_BGR2RGB)
     results = pose.process(image_rgb)
 
     # 姿勢推定の結果があれば、ランドマークを描画
     if results.pose_landmarks:
         mp_drawing.draw_landmarks(
-            image,
+            after_image,
             results.pose_landmarks,
             mp_pose.POSE_CONNECTIONS
         )
@@ -35,4 +35,4 @@ def func(image):
         # print(f"右手の座標: {right_hand_coordinates}")
 
     pose.close()
-    return image
+    return after_image
