@@ -7,6 +7,7 @@ from io import BytesIO
 from PIL import Image, UnidentifiedImageError
 import io
 from fastapi import UploadFile, File
+import time
 
 app = FastAPI()
 
@@ -32,6 +33,8 @@ class ImageData(BaseModel):
 
 @app.post("/")
 async def upload_image(data: UploadFile = File(...)):
+    # 0.5秒たいき
+    # time.sleep(0.5)
     # 画像のバイナリデータを読み込み
     image = Image.open(io.BytesIO(await data.read()))
     # 画像を表示
