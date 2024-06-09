@@ -1,3 +1,6 @@
 fastapi
 gunicorn
 uvicorn
+opencv-python
+Pillow
+mediapipe
