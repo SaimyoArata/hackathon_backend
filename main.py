@@ -42,8 +42,8 @@ async def upload_image(
         # 0.5秒たいき
         # time.sleep(0.5)
         # 画像のバイナリデータを読み込み
-        target_image = Image.open(io.BytesIO(await data1.read()))
-        player_image = Image.open(io.BytesIO(await data2.read()))
+        player_image = Image.open(io.BytesIO(await data1.read()))
+        target_image = Image.open(io.BytesIO(await data2.read()))
         # 画像を表示
         # target_image.show()
         # player_image.show()
