@@ -1,14 +1,14 @@
 import numpy as np
 
 #入力(pose_landmarks)：姿勢推定から得られたランドマークのデータ
-#出力：12の点(右肩)からの相対座標(numpy配列)
+#出力：0の点(右肩)からの相対座標(numpy配列)
 def landmark2np(pose_landmarks):
-    detected_point = 12
+    detected_point = 0
     li = []
     for j in pose_landmarks.landmark:
-        li.append([j.x, j.y, j.z])
+        li.append([j.x, j.y])
     for i, k in enumerate(li):
-        if k[0] == 0 and k[1] == 0 and k[2] == 0:
+        if k[0] == 0 and k[1] == 0:
             print("No detected")
             li[i] = li[detected_point]
 

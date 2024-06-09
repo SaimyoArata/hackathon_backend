@@ -8,6 +8,7 @@ from PIL import Image, UnidentifiedImageError
 import io
 from fastapi import UploadFile, File 
 from skeleton import func
+from pose_analysis import landmark2np, manual_cos
 
 app = FastAPI()
 
@@ -32,17 +33,23 @@ class ImageData(BaseModel):
 
 
 @app.post("/")
-async def upload_image(data: UploadFile = File(...)):
-    # 0.5秒たいき
-    # time.sleep(0.5)
-    # 画像のバイナリデータを読み込み
-    image = Image.open(io.BytesIO(await data.read()))
-    # 画像を表示
-    # image.show()
-
+async def upload_image(
+    data1: UploadFile = File(...), # target_image
+    data2: UploadFile = File(...)  # player_image
+):
     try:
-        # 骨格検出とその他の処理を行う
-        processed_image = func(image)
+        # 0.5秒たいき
+        # time.sleep(0.5)
+        # 画像のバイナリデータを読み込み
+        target_image = Image.open(io.BytesIO(await data1.read()))
+        player_image = Image.open(io.BytesIO(await data2.read()))
+        # 画像を表示
+        # target_image.show()
+        # player_image.show()
+
+    
+        # 骨格検出後の画像とランドマーク(list(tuple))を取得
+        processed_image, score = func(target_image, player_image)
 
         # 処理された画像をバイナリデータに変換
         print("Encoding processed image")
@@ -50,8 +57,14 @@ async def upload_image(data: UploadFile = File(...)):
         processed_image.save(buffered, format="JPEG")
         buffered.seek(0)
 
+        # 画像とスコアをレスポンスする
+        response = StreamingResponse(buffered, media_type="image/jpeg")
+        response.headers["score"] = str(score)
+
+        return response
+
+
         # return {"message": "Image processed successfully", "processed_image": encoded_image}
-        return StreamingResponse(buffered, media_type="image/jpeg")
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
